@@ -3,7 +3,9 @@ module CassandraRuby
     attr_reader :name, :endpoints
 
     def initialize(host_or_hosts, options = {})
-      @port = options[:port] || 9160
+      @port      = options[:port]      || 9160
+      @transport = options[:transport] || ::Thrift::BufferedTransport
+
       @endpoints = host_or_hosts.is_a?(Array) ? host_or_hosts.dup : [host_or_hosts]
     end
 
@@ -15,9 +17,7 @@ module CassandraRuby
     end
 
     def disconnect
-      if @connection && @connection.open?
-        @connection.close
-      end
+      @connection.close if @connection && @connection.open?
       @connection = nil
       @client     = nil
     end
@@ -49,9 +49,9 @@ module CassandraRuby
 
     def connect_to(host)
       @connection = ::Thrift::Socket.new(host, @port)
-      protocol = ::Thrift::BinaryProtocol.new(@connection)
-      @client = Thrift::Client.new(protocol)
+      @connection = @transport.new(@connection)
       @connection.open
+      @client = Thrift::Client.new(::Thrift::BinaryProtocol.new(@connection))
     rescue ::Thrift::TransportException
       disconnect
       raise

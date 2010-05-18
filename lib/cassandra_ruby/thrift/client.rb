@@ -38,14 +38,14 @@ module CassandraRuby
         recv_insert()
       end
 
-      def remove(keyspace, key, column_path, timestamp, consistency_level)
-        send_remove(keyspace, key, column_path, timestamp, consistency_level)
-        recv_remove()
-      end
-
       def batch_mutate(keyspace, mutation_map, consistency_level)
         send_batch_mutate(keyspace, mutation_map, consistency_level)
         recv_batch_mutate()
+      end
+      
+      def remove(keyspace, key, column_path, timestamp, consistency_level)
+        send_remove(keyspace, key, column_path, timestamp, consistency_level)
+        recv_remove()
       end
 
       def describe_keyspaces()
@@ -71,11 +71,6 @@ module CassandraRuby
       def describe_keyspace(keyspace)
         send_describe_keyspace(keyspace)
         return recv_describe_keyspace()
-      end
-
-      def describe_splits(start_token, end_token, keys_per_split)
-        send_describe_splits(start_token, end_token, keys_per_split)
-        return recv_describe_splits()
       end
 
       protected
@@ -167,16 +162,6 @@ module CassandraRuby
         raise result.ue unless result.ue.nil?
         raise result.te unless result.te.nil?
         return
-      end
-
-      def send_describe_splits(start_token, end_token, keys_per_split)
-        send_message('describe_splits', Describe_splits_args, :start_token => start_token, :end_token => end_token, :keys_per_split => keys_per_split)
-      end
-
-      def recv_describe_splits()
-        result = receive_message(Describe_splits_result)
-        return result.success unless result.success.nil?
-        raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'describe_splits failed: unknown result')
       end
 
       def send_describe_keyspace(keyspace)
@@ -867,47 +852,6 @@ module CassandraRuby
 
       def validate
       end
-
     end
-
-    class Describe_splits_args
-      include ::Thrift::Struct
-      START_TOKEN = 1
-      END_TOKEN = 2
-      KEYS_PER_SPLIT = 3
-
-      ::Thrift::Struct.field_accessor self, :start_token, :end_token, :keys_per_split
-      FIELDS = {
-        START_TOKEN => {:type => ::Thrift::Types::STRING, :name => 'start_token'},
-        END_TOKEN => {:type => ::Thrift::Types::STRING, :name => 'end_token'},
-        KEYS_PER_SPLIT => {:type => ::Thrift::Types::I32, :name => 'keys_per_split'}
-      }
-
-      def struct_fields; FIELDS; end
-
-      def validate
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field start_token is unset!') unless @start_token
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field end_token is unset!') unless @end_token
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field keys_per_split is unset!') unless @keys_per_split
-      end
-
-    end
-
-    class Describe_splits_result
-      include ::Thrift::Struct
-      SUCCESS = 0
-
-      ::Thrift::Struct.field_accessor self, :success
-      FIELDS = {
-        SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRING}}
-      }
-
-      def struct_fields; FIELDS; end
-
-      def validate
-      end
-
-    end
-
   end
 end
