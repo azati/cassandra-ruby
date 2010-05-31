@@ -20,23 +20,38 @@
 #   Artem Zakolodkin
 #
 
-require "rubygems"
-require 'lib/cassandra_ruby'
-require "spec"
+require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require 'lib/cassandra_ruby/thrift_helper'
 
-def addr 
-  @addr = @addr || local_ip
-  @addr
+class Dummy
+  include CassandraRuby::ThriftHelper
+  
+  def ts(ts)
+    self.cast_timestamp(ts)
+  end
+  
+  def consistancy(c = {})
+    self.cast_consistancy(c)
+  end
 end
 
-def addr=(addr)
-  @addr = addr
-end
-
-private 
-
-def local_ip
-  ifconfig = %x(which /sbin/ifconfig).strip
-  %x(ifconfig).split("lo").shift =~ /inet addr\:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s/
-  $1
+describe CassandraRuby::ThriftHelper do
+  
+  before(:all) do
+    @helper = Dummy.new
+  end
+  
+  it "should have default options" do
+    @helper.default_options.should_not == nil
+  end
+  
+  it "should cast time to millisecodns" do
+    ts = Time.now
+    @helper.ts(ts).should == ts.to_i * 1_000_000 + ts.usec
+  end
+  
+  it "should ensure consistency" do
+    @helper.consistancy.should_not == nil
+    @helper.consistancy.should == CassandraRuby::Thrift::ConsistencyLevel::const_get(@helper.default_options[:consistency].to_s.upcase)
+  end
 end
