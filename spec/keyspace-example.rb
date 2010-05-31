@@ -20,23 +20,35 @@
 #   Artem Zakolodkin
 #
 
-require "rubygems"
-require 'lib/cassandra_ruby'
-require "spec"
+require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require 'lib/cassandra_ruby/keyspace'
 
-def addr 
-  @addr = @addr || local_ip
-  @addr
+shared_examples_for "initialized-keyspace" do
+  it "should have entry point" do
+    @ks.client.should_not == nil
+  end
+  
+  it "should have the name" do
+    @ks.name.should_not == nil
+  end
+  
 end
 
-def addr=(addr)
-  @addr = addr
-end
-
-private 
-
-def local_ip
-  ifconfig = %x(which /sbin/ifconfig).strip
-  %x(ifconfig).split("lo").shift =~ /inet addr\:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s/
-  $1
+describe CassandraRuby::Keyspace do
+  
+  before(:all) do
+    @cassandra = CassandraRuby::Cassandra.new(addr)
+    @cassandra.should_not == nil
+    
+    @ks = CassandraRuby::Keyspace.new(@cassandra, 'Keyspace1')
+  end
+  
+  after(:all) do
+    @cassandra.disconnect
+  end
+  
+  it_should_behave_like "initialized cassandra"
+  it_should_behave_like "initialized-keyspace"
+  
+  
 end
