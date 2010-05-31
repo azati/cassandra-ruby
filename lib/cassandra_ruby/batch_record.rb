@@ -20,19 +20,26 @@
 #   Alexander Markelov
 #
 
-require 'thrift'
+module CassandraRuby
+  class BatchRecord < Record
+    attr_reader :mutation_map
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+    def initialize(keyspace)
+      super(keyspace)
+      @mutation_map = Hash.new { |hash, key| hash[key] = [] }
+    end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+    def insert(column_family, super_column, columns, time, options = {})
+      insertions = columns.map { |name, value| cast_column(name, value, time) }
+      insertions = [cast_super_column(super_column, insertions)]  if super_column
+      insertions.map! { |i| cast_mutation(i) }
+      @mutation_map[column_family.to_s].concat(insertions)
+    end
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+    def remove(column_family, super_column, column, time, options = {})
+      deletion = cast_deletion(super_column, column, time, options)
+      deletion = cast_mutation(deletion)
+      @mutation_map[column_family.to_s] << deletion
+    end
+  end
+end

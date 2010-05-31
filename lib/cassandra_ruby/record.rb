@@ -20,19 +20,32 @@
 #   Alexander Markelov
 #
 
-require 'thrift'
+module CassandraRuby
+  class Record
+    include ThriftHelper
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+    attr_reader :keyspace
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+    def initialize(keyspace)
+      @keyspace = keyspace
+    end
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+    def get(column_family, super_column, column = nil, options = {})
+      raise NotImplementedError
+    end
+
+    def insert(column_family, super_column, columns, time, options = {})
+      raise NotImplementedError
+    end
+
+    def remove(column_family, super_column, column, time, options = {})
+      raise NotImplementedError
+    end
+
+    protected
+
+    def client
+      keyspace.client
+    end
+  end
+end

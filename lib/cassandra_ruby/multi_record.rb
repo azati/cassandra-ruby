@@ -20,19 +20,28 @@
 #   Alexander Markelov
 #
 
-require 'thrift'
+module CassandraRuby
+  class MultiRecord < Record
+    attr_reader :keys
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+    def initialize(keyspace, keys)
+      super(keyspace)
+      @keys = keys
+    end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+    def get(column_family, super_column, column = nil, options = {})
+      if column.nil? || super_column.is_a?(Array) || super_column.is_a?(Range)
+        super_column, column = nil, super_column
+        column = ''..'' if column.nil?
+      end
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+      key_columns = client.multiget_slice(keyspace.name, keys, cast_column_parent(column_family, super_column), cast_slice_predicate(column, options), cast_consistancy(options))
+
+      if column.is_a?(String)
+        key_columns.each { |key, columns| key_columns[key] = columns.first && convert_column(columns.first) }
+      else
+        key_columns.each { |key, columns| key_columns[key] = convert_columns(columns) }
+      end
+    end
+  end
+end
