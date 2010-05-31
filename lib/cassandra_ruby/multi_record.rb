@@ -29,7 +29,7 @@ module CassandraRuby
       @keys = keys
     end
 
-    def get(column_family, super_column, column = nil, options = {})
+    def get(column_family, super_column = nil, column = nil, options = {})
       if column.nil? || super_column.is_a?(Array) || super_column.is_a?(Range)
         super_column, column = nil, super_column
         column = ''..'' if column.nil?
@@ -41,6 +41,22 @@ module CassandraRuby
         key_columns.each { |key, columns| key_columns[key] = columns.first && convert_column(columns.first) }
       else
         key_columns.each { |key, columns| key_columns[key] = convert_columns(columns) }
+      end
+    end
+
+    def insert(column_family, super_column, columns, time, options = {})
+      keyspace.batch(options) do |batch|
+        keys.each do |k|
+          batch[k].insert(column_family, super_column, columns, time, options)
+        end
+      end
+    end
+
+    def remove(column_family, super_column, column, time, options = {})
+      keyspace.batch(options) do |batch|
+        keys.each do |k|
+          batch[k].remove(column_family, super_column, column, time, options)
+        end
       end
     end
   end

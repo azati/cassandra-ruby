@@ -29,7 +29,7 @@ module CassandraRuby
       @key_range = key_range
     end
 
-    def get(column_family, super_column, column = nil, options = {})
+    def get(column_family, super_column = nil, column = nil, options = {})
       if column.nil? || super_column.is_a?(Array) || super_column.is_a?(Range)
         super_column, column = nil, super_column
         column = ''..'' if column.nil?

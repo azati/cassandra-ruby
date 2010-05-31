@@ -30,7 +30,7 @@ module CassandraRuby
       @keyspace = keyspace
     end
 
-    def get(column_family, super_column, column = nil, options = {})
+    def get(column_family, super_column = nil, column = nil, options = {})
       raise NotImplementedError
     end
 

@@ -29,12 +29,13 @@ module CassandraRuby
       @key = key
     end
 
-    def get(column_family, super_column, column = nil, options = {})
+    def get(column_family, super_column = nil, column = nil, options = {})
       if super_column.is_a?(Array) || super_column.is_a?(Range)
         super_column, column = nil, super_column
-      elsif super_column.nil?
-        column ||= ''..''
+      elsif super_column.nil? && column.nil?
+        column = ''..''
       end
+
       if column.nil? || column.is_a?(String)
         column = client.get(keyspace.name, key, cast_column_path(column_family, super_column, column), cast_consistancy(options))
         convert_column(column)
@@ -58,7 +59,7 @@ module CassandraRuby
       if super_column.is_a?(Array) || super_column.is_a?(Range)
         super_column, column = nil, super_column
       end
-      if column.is_a?(NilClass) || column.is_a?(String)
+      if column.nil? || column.is_a?(String)
         client.remove(keyspace.name, key, cast_column_path(column_family, super_column, column), cast_timestamp(time), cast_consistancy(options))
       else
         keyspace.batch(options) do |batch|
