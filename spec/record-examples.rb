@@ -17,22 +17,32 @@
 #
 # ----------------------------------------------------------------------------
 # Authors:
-#   Alexander Markelov
+#   Artem Zakolodkin
 #
 
-require 'thrift'
+require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require 'lib/cassandra_ruby/record'
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+shared_examples_for "initialized-record" do
+  it "should have keyspace" do
+    @record.keyspace.should_not == nil
+  end
+end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
-
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+describe CassandraRuby::Record do
+  
+  before(:each) do
+    @cassandra = CassandraRuby::Cassandra.new(addr)
+    @cassandra.should_not == nil
+    
+    @ks = CassandraRuby::Keyspace.new(@cassandra, 'Keyspace1')
+    
+    @record = CassandraRuby::Record.new(@ks)
+  end
+  
+  after(:all) do
+    @cassandra.disconnect
+  end
+  
+  it_should_behave_like "initialized-record"
+end

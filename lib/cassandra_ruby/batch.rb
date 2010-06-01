@@ -18,21 +18,32 @@
 # ----------------------------------------------------------------------------
 # Authors:
 #   Alexander Markelov
-#
+#   
 
-require 'thrift'
+module CassandraRuby
+  class Batch
+    include ThriftHelper
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+    attr_reader :keyspace
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+    def initialize(keyspace)
+      @keyspace = keyspace
+      @records = {}
+    end
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+    def [](key)
+      @records[key] ||= BatchRecord.new(keyspace)
+    end
+
+    def mutate(options = {})
+      keyspace.client.batch_mutate(keyspace.name, mutation_map, cast_consistancy(options))
+    end
+
+    def mutation_map
+      @records.inject({}) do |memo, (key, record)|
+        memo[key] = record.mutation_map
+        memo
+      end
+    end
+  end
+end

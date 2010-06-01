@@ -17,22 +17,38 @@
 #
 # ----------------------------------------------------------------------------
 # Authors:
-#   Alexander Markelov
+#   Artem Zakolodkin
 #
 
-require 'thrift'
+require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require 'lib/cassandra_ruby/keyspace'
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+shared_examples_for "initialized-keyspace" do
+  it "should have entry point" do
+    @ks.client.should_not == nil
+  end
+  
+  it "should have the name" do
+    @ks.name.should_not == nil
+  end
+  
+end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
-
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+describe CassandraRuby::Keyspace do
+  
+  before(:all) do
+    @cassandra = CassandraRuby::Cassandra.new(addr)
+    @cassandra.should_not == nil
+    
+    @ks = CassandraRuby::Keyspace.new(@cassandra, 'Keyspace1')
+  end
+  
+  after(:all) do
+    @cassandra.disconnect
+  end
+  
+  it_should_behave_like "initialized cassandra"
+  it_should_behave_like "initialized-keyspace"
+  
+  
+end

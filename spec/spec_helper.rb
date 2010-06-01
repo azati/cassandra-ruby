@@ -17,22 +17,26 @@
 #
 # ----------------------------------------------------------------------------
 # Authors:
-#   Alexander Markelov
+#   Artem Zakolodkin
 #
 
-require 'thrift'
+require "rubygems"
+require 'lib/cassandra_ruby'
+require "spec"
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+def addr 
+  @addr = @addr || local_ip
+  @addr
+end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+def addr=(addr)
+  @addr = addr
+end
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+private 
+
+def local_ip
+  ifconfig = %x(which /sbin/ifconfig).strip
+  %x(ifconfig).split("lo").shift =~ /inet addr\:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s/
+  $1
+end

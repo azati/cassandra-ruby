@@ -20,19 +20,33 @@
 #   Alexander Markelov
 #
 
-require 'thrift'
+module CassandraRuby
+  class Keyspace
+    attr_reader :client, :name
 
-require 'cassandra_ruby/thrift/constants'
-require 'cassandra_ruby/thrift/types'
-require 'cassandra_ruby/thrift/client'
+    def initialize(client, name)
+      @client, @name = client, name.to_s
+    end
 
-require 'cassandra_ruby/cassandra'
-require 'cassandra_ruby/keyspace'
+    def [](key, *keys)
+      keys = keys.empty? ? key : [key] + keys
 
-require 'cassandra_ruby/thrift_helper'
-require 'cassandra_ruby/record'
-require 'cassandra_ruby/batch'
-require 'cassandra_ruby/single_record'
-require 'cassandra_ruby/batch_record'
-require 'cassandra_ruby/multi_record'
-require 'cassandra_ruby/range_record'
+      record_type = case keys
+      when String
+        SingleRecord
+      when Array
+        MultiRecord
+      when Range
+        RangeRecord
+      end
+
+      record_type.new(self, keys)
+    end
+
+    def batch(options = {})
+      batch = Batch.new(self)
+      yield(batch)
+      batch.mutate(options)
+    end
+  end
+end
