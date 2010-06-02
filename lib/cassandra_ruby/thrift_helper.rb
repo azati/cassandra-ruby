@@ -93,7 +93,7 @@ module CassandraRuby
       when Range
         { :slice_range => cast_slice_range(columns, options) }
       else
-        raise ArgumentError.new('columns can be Range or Array')
+        raise ArgumentError.new('columns can be String, Array or Range')
       end
       Thrift::SlicePredicate.new(params)
     end

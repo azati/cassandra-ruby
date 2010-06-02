@@ -20,29 +20,27 @@
 #   Artem Zakolodkin
 #
 
-require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
 require 'lib/cassandra_ruby/record'
 
-shared_examples_for "initialized-record" do
-  it "should have keyspace" do
-    @record.keyspace.should_not == nil
-  end
-end
-
 describe CassandraRuby::Record do
-  
   before(:each) do
-    @cassandra = CassandraRuby::Cassandra.new(addr)
-    @cassandra.should_not == nil
-    
-    @ks = CassandraRuby::Keyspace.new(@cassandra, 'Keyspace1')
-    
-    @record = CassandraRuby::Record.new(@ks)
+    @object = CassandraRuby::Record.new(@ks)
   end
   
-  after(:all) do
-    @cassandra.disconnect
+  it_should_behave_like "prepared environment"
+  it_should_behave_like "initialized record"
+  
+  it "should not implement 'get'" do
+    lambda {@object.get(nil, super_column = nil, column = nil, options = {})}.should raise_error(NotImplementedError)
   end
   
-  it_should_behave_like "initialized-record"
+  it "should not implement 'insert'" do
+    lambda {@object.insert(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+  end
+  
+  it "should not implement 'remove'" do
+    lambda {@object.remove(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+  end
+  
 end

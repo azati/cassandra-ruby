@@ -20,19 +20,8 @@
 #   Artem Zakolodkin
 #
 
-require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
 require 'lib/cassandra_ruby/keyspace'
-
-shared_examples_for "initialized-keyspace" do
-  it "should have entry point" do
-    @ks.client.should_not == nil
-  end
-  
-  it "should have the name" do
-    @ks.name.should_not == nil
-  end
-  
-end
 
 describe CassandraRuby::Keyspace do
   
@@ -48,7 +37,6 @@ describe CassandraRuby::Keyspace do
   end
   
   it_should_behave_like "initialized cassandra"
-  it_should_behave_like "initialized-keyspace"
-  
+  it_should_behave_like "initialized keyspace"
   
 end

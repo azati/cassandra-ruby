@@ -20,18 +20,8 @@
 #   Artem Zakolodkin
 #
 
-require File.expand_path(File.join('.', 'spec_helper'), File.dirname(__FILE__))
+require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
 require 'lib/cassandra_ruby/cassandra'
-
-shared_examples_for "initialized cassandra" do
-	it "should has inititially nil name" do
-		@cassandra.cluster_name.should == nil
-	end
-	
-	it "should has inititially initialized endpoints array" do
-		@cassandra.endpoints.should_not == nil
-	end
-end
 
 describe CassandraRuby::Cassandra do
 	
@@ -46,25 +36,25 @@ describe CassandraRuby::Cassandra do
 	
 	it_should_behave_like "initialized cassandra"
 	
-	it "should connect to cassandra" do
+	it "#{described_class} should connect to cassandra" do
 		@cassandra.connect
 		@cassandra.cluster_name.should == "Test Cluster"
 		@cassandra.endpoints.should == addr.to_a
 	end
 	
-	it "should disconnect from cassandra" do
+	it "#{described_class} should disconnect from cassandra" do
 		@cassandra.disconnect
 		@cassandra.cluster_name.should == nil
 		@cassandra.endpoints.should == addr.to_a
 	end
 	
-	it "should make reconnect with cassandra" do
+	it "#{described_class} should make reconnect with cassandra" do
 		@cassandra.reconnect
 		@cassandra.cluster_name.should == "Test Cluster"
 		@cassandra.endpoints.should == addr.to_a
 	end
 	
-	it "should fail if hasn't any endpoints" do
+	it "#{described_class} should fail if hasn't any endpoints" do
 		@cassandra.endpoints.clear
 		pending("not fails for now") do
 			raise 	
