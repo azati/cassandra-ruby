@@ -71,6 +71,9 @@ shared_examples_for "initialized record" do
 end
 
 shared_examples_for "thrift helper" do
+  
+  it_should_behave_like "prepared environment"
+  
   it "Record should have default options" do
     @object.send('default_options').should_not == nil
   end
@@ -130,30 +133,44 @@ shared_examples_for "thrift helper" do
   end
   
   it "Record should cast set of params to Thrift::SliceRange" do
-    pending("not implemented") do
-      raise   
-    end    
+    column_range = '1'..'5'
+    slice_range = @object.send('cast_slice_range', column_range, {})
+    slice_range.class.should == CassandraRuby::Thrift::SliceRange
+    slice_range.count.should == @object.default_options[:count]
+    slice_range.reversed.should == @object.default_options[:reversed]
   end
   
   it "Record should cast set of params to Thrift::KeyRange" do
-    pending("not implemented") do
-      raise   
-    end
-  end
-  
-  it "Record should cast set of params to Thrift::Mutation" do
-    pending("not implemented") do
-      raise   
-    end
+    column_range = '1'..'5'
+    key_range = @object.send('cast_key_range', column_range, {})
+    key_range.class.should == CassandraRuby::Thrift::KeyRange
+    key_range.count.should == @object.default_options[:key_count]
   end
   
   it "Record should cast set of params to Thrift::Deletion" do
-    pending("not implemented") do
-      raise   
-    end
+    super_column = @object.send('cast_super_column', "name", "strange columns")
+    @object.send('cast_deletion', super_column, [], Time.now, {}).class.should == CassandraRuby::Thrift::Deletion
+  end
+  
+  it "Record should cast set of params to Thrift::Mutation" do
+    column = @object.send('cast_column', "name", "value", Time.now)
+    mutation = @object.send('cast_mutation', column)
+    mutation.class.should == CassandraRuby::Thrift::Mutation
+    mutation.column_or_supercolumn.should == @object.send('cast_column_or_supercolumn', column) 
+    
+    super_column = @object.send('cast_super_column', "name", column)
+    mutation = @object.send('cast_mutation', super_column)
+    mutation.class.should == CassandraRuby::Thrift::Mutation
+    mutation.column_or_supercolumn.should == @object.send('cast_column_or_supercolumn', super_column)
+    
+    deletion = @object.send('cast_deletion', super_column, [], Time.now, {})
+    mutation = @object.send('cast_mutation', deletion)
+    mutation.class.should == CassandraRuby::Thrift::Mutation
+    mutation.deletion.should == deletion
+    
+    lambda{@object.send('cast_mutation', String.new)}.should raise_error(ArgumentError, 'Mutation should be a Column, SuperColumn or Deletion')
   end
 end
-
 
 def addr 
   @addr = @addr || local_ip

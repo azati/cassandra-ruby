@@ -28,7 +28,6 @@ describe CassandraRuby::BatchRecord do
     @object = CassandraRuby::BatchRecord.new(@ks)
   end
   
-  it_should_behave_like "prepared environment"
   it_should_behave_like "initialized record"
   
   it "#{described_class} should not implement 'get'" do

@@ -28,7 +28,6 @@ describe CassandraRuby::Record do
     @object = CassandraRuby::Record.new(@ks)
   end
   
-  it_should_behave_like "prepared environment"
   it_should_behave_like "initialized record"
   
   it "should not implement 'get'" do

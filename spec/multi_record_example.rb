@@ -27,7 +27,6 @@ describe CassandraRuby::MultiRecord do
     @object = CassandraRuby::MultiRecord.new(@ks, '')
   end
   
-  it_should_behave_like "prepared environment"
   it_should_behave_like "initialized record"
 
   it "#{described_class} should implement 'get'" do
