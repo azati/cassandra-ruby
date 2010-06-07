@@ -21,26 +21,14 @@
 #
 
 require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
-require 'lib/cassandra_ruby/batch'
-
-
 
 describe CassandraRuby::Batch do
-  
-  before(:all) do
-    @cassandra = CassandraRuby::Cassandra.new(addr)
-    @cassandra.should_not == nil
-    
-    @ks = CassandraRuby::Keyspace.new(@cassandra, 'Keyspace1')
-  end
   
   before(:each) do
     @object = CassandraRuby::Batch.new(@ks)
   end
   
-  after(:all) do
-    @cassandra.disconnect
-  end
+  it_should_behave_like "prepared environment"
   
   it "#{described_class} should implement '[]' method" do
     lambda {@object['']}.should_not raise_error
@@ -48,15 +36,16 @@ describe CassandraRuby::Batch do
   end
   
   it "#{described_class} should create mutation map" do
-    @object['key1']
-    @object['key2']
-    @object['key3']
+    record = @object['key1']
+    @object.mutation_map.should == {"key1"=>{}}
   end
   
   it "#{described_class} should mutate" do
-    pending("not implemented") do
-      raise   
-    end    
+    @object.mutation_map.should == {}
+    lambda {@object.mutate}.should_not raise_error
+    
+    batch_record = @object['key1']
+    lambda {@object.mutate}.should_not raise_error
   end
   
 end

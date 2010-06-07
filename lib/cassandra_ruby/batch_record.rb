@@ -36,8 +36,8 @@ module CassandraRuby
       @mutation_map[column_family.to_s].concat(insertions)
     end
 
-    def remove(column_family, super_column, column, time, options = {})
-      deletion = cast_deletion(super_column, column, time, options)
+    def remove(column_family, super_column, columns, time, options = {})
+      deletion = cast_deletion(super_column, columns, time, options)
       deletion = cast_mutation(deletion)
       @mutation_map[column_family.to_s] << deletion
     end

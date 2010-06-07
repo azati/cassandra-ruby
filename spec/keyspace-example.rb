@@ -21,7 +21,6 @@
 #
 
 require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
-require 'lib/cassandra_ruby/keyspace'
 
 describe CassandraRuby::Keyspace do
   

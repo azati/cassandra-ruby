@@ -35,15 +35,14 @@ describe CassandraRuby::BatchRecord do
   end
   
   it "#{described_class} should implement 'insert'" do
-    pending("not implemented") do
-      raise   
-    end    
+    @object.insert('Standard1', super_column = nil, ['Column1', 'Column2'], Time.now)
+    @object.mutation_map['Standard1'].should_not == nil
+    @object.mutation_map['Standard1'].size.should == 2
   end
   
   it "#{described_class} should implement 'remove'" do
-    pending("not implemented") do
-      raise   
-    end    
+    @object.remove('Standard1', super_column = nil, ['Column1', 'Column2'], Time.now)
+    @object.mutation_map['Standard1'].should_not == nil
   end
   
 end

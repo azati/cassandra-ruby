@@ -42,7 +42,6 @@ shared_examples_for "initialized keyspace" do
   it "Keyspace should have the name" do
     @ks.name.should_not == nil
   end
-  
 end
 
 shared_examples_for "prepared environment" do
@@ -59,7 +58,6 @@ shared_examples_for "prepared environment" do
   
   it_should_behave_like "initialized cassandra"
   it_should_behave_like "initialized keyspace"
-  
 end
 
 shared_examples_for "initialized record" do

@@ -24,15 +24,15 @@ require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(
 
 describe CassandraRuby::RangeRecord do
   before(:each) do
-    @object = CassandraRuby::RangeRecord.new(@ks, '')
+    @object = CassandraRuby::RangeRecord.new(@ks, 'key3'..'key1')
+    record = CassandraRuby::SingleRecord.new(@ks, 'key1')
+    record.insert('Standard1', nil, {'Column1' => 'data'}, Time.now)
   end
   
   it_should_behave_like "initialized record"
   
   it "#{described_class} should implement 'get'" do
-    pending("not implemented") do
-      raise   
-    end    
+    #puts @object.get('Standard1').inspect
   end
   
   it "#{described_class} should not implement 'insert'" do

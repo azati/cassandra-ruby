@@ -21,7 +21,6 @@
 #
 
 require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(__FILE__))
-require 'lib/cassandra_ruby/cassandra'
 
 describe CassandraRuby::Cassandra do
 	
@@ -56,9 +55,7 @@ describe CassandraRuby::Cassandra do
 	
 	it "#{described_class} should fail if hasn't any endpoints" do
 		@cassandra.endpoints.clear
-		pending("not fails for now") do
-			raise 	
-		end
+    lambda {@cassandra.connect}.should raise_error(Thrift::TransportException)
 	end
 	
 end
