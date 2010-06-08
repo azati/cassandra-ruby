@@ -23,18 +23,18 @@
 module CassandraRuby
   class RangeRecord < Record
     attr_reader :key_range
-
+    
     def initialize(keyspace, key_range)
       super(keyspace)
       @key_range = key_range
     end
-
+    
     def get(column_family, super_column = nil, column = nil, options = {})
       if column.nil? || super_column.is_a?(Array) || super_column.is_a?(Range)
         super_column, column = nil, super_column
         column = ''..'' if column.nil?
       end
-
+      
       key_slices = client.get_range_slices(keyspace.name, cast_column_parent(column_family, super_column), cast_slice_predicate(column, options), cast_key_range(key_range, options), cast_consistancy(options))
       
       if column.is_a?(String)
