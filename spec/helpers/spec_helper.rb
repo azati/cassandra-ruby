@@ -60,7 +60,77 @@ shared_examples_for "prepared environment" do
   it_should_behave_like "initialized keyspace"
 end
 
+# Use the following if some data is needed in the DB before tests. 
+shared_examples_for "fixtures loaded" do
+  
+  it_should_behave_like "prepared environment"
+  
+  #TODO: optimize the following code
+  before(:each) do
+    @data = {'spec_key1' => 'data1', 'spec_key2' => 'data2', 'spec_key3' => 'data3'}
+    @data.each do |key, data|
+      record = CassandraRuby::SingleRecord.new(@ks, key)
+      column_path = CassandraRuby::Thrift::ColumnPath.new(
+        :column_family => 'Standard1',
+        :super_column  => nil,
+        :column        => 'Column1'
+      )
+      time = Time.now
+      time = time.to_i * 1_000_000 + time.usec
+      record.keyspace.client.insert(record.keyspace.name, key, column_path, data, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+      column_path = CassandraRuby::Thrift::ColumnPath.new(
+        :column_family => 'Standard1',
+        :super_column  => nil,
+        :column        => 'Column2'
+      )
+      record.keyspace.client.insert(record.keyspace.name, key, column_path, data, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+      column_path = CassandraRuby::Thrift::ColumnPath.new(
+        :column_family => 'Super1',
+        :super_column  => 'SuperColumn',
+        :column        => 'Column1'
+      )
+      record.keyspace.client.insert(record.keyspace.name, key, column_path, data, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+      column_path = CassandraRuby::Thrift::ColumnPath.new(
+        :column_family => 'Super1',
+        :super_column  => 'SuperColumn',
+        :column        => 'Column2'
+      )
+      record.keyspace.client.insert(record.keyspace.name, key, column_path, data, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+    end
+  end
+  
+  #TODO: optimize the following code
+  after(:each) do
+    @data.each do |key, data|
+      record = CassandraRuby::SingleRecord.new(@ks, key)
+      column_path = CassandraRuby::Thrift::ColumnPath.new(:column_family => 'Standard1',
+        :super_column  => nil,
+        :column        => 'Column1'
+      )
+      time = Time.now
+      time = time.to_i * 1_000_000 + time.usec      
+      record.keyspace.client.remove(record.keyspace.name, key, column_path, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+      column_path = CassandraRuby::Thrift::ColumnPath.new(:column_family => 'Standard1',
+        :super_column  => nil,
+        :column        => 'Column2'
+      )
+      record.keyspace.client.remove(record.keyspace.name, key, column_path, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+      column_path = CassandraRuby::Thrift::ColumnPath.new(:column_family => 'Super1',
+        :super_column  => 'SuperColumn',
+        :column        => nil
+      )
+      record.keyspace.client.remove(record.keyspace.name, key, column_path, time, CassandraRuby::Thrift::ConsistencyLevel::const_get(:one.to_s.upcase))
+    end
+  end
+  
+end
+
 shared_examples_for "initialized record" do
+  
+  after(:each) do
+    @object = nil
+  end
+  
   it "Record should have keyspace" do
     @object.keyspace.should_not == nil
   end

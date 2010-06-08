@@ -31,17 +31,17 @@ describe CassandraRuby::BatchRecord do
   it_should_behave_like "initialized record"
   
   it "#{described_class} should not implement 'get'" do
-    lambda {@object.get(nil, super_column = nil, column = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.get(nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
   it "#{described_class} should implement 'insert'" do
-    @object.insert('Standard1', super_column = nil, ['Column1', 'Column2'], Time.now)
+    @object.insert('Standard1', nil, ['Column1', 'Column2'], Time.now)
     @object.mutation_map['Standard1'].should_not == nil
     @object.mutation_map['Standard1'].size.should == 2
   end
   
   it "#{described_class} should implement 'remove'" do
-    @object.remove('Standard1', super_column = nil, ['Column1', 'Column2'], Time.now)
+    @object.remove('Standard1', nil, ['Column1', 'Column2'], Time.now)
     @object.mutation_map['Standard1'].should_not == nil
   end
   

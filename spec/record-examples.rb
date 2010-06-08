@@ -30,15 +30,15 @@ describe CassandraRuby::Record do
   it_should_behave_like "initialized record"
   
   it "should not implement 'get'" do
-    lambda {@object.get(nil, super_column = nil, column = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.get(nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
   it "should not implement 'insert'" do
-    lambda {@object.insert(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.insert(nil, nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
   it "should not implement 'remove'" do
-    lambda {@object.remove(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.remove(nil, nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
 end

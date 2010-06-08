@@ -24,27 +24,26 @@ require File.expand_path(File.join('.', 'helpers', 'spec_helper'), File.dirname(
 
 describe CassandraRuby::RangeRecord do
   before(:each) do
-    @object = CassandraRuby::RangeRecord.new(@ks, 'key1'..'key3')
-    record = CassandraRuby::SingleRecord.new(@ks, 'key1')
-    record.insert('Standard1', nil, {'Column1' => 'data1'}, Time.now)
-    record = CassandraRuby::SingleRecord.new(@ks, 'key2')
-    record.insert('Standard1', nil, {'Column1' => 'data2'}, Time.now)
-    record = CassandraRuby::SingleRecord.new(@ks, 'key3')
-    record.insert('Standard1', nil, {'Column1' => 'data3'}, Time.now)
+    @object = CassandraRuby::RangeRecord.new(@ks, ''..'')
   end
   
   it_should_behave_like "initialized record"
+  it_should_behave_like "fixtures loaded"
   
   it "#{described_class} should implement 'get'" do
-    puts @object.get('Standard1').inspect
+    result = @object.get('Standard1')
+    @data.each_key do |key| 
+      result.has_key?(key).should == true
+    end
+    result.class.should == Hash 
   end
   
   it "#{described_class} should not implement 'insert'" do
-    lambda {@object.insert(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.insert(nil, nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
   it "#{described_class} should not implement 'remove'" do
-    lambda {@object.remove(nil, super_column = nil, column = nil, time = nil, options = {})}.should raise_error(NotImplementedError)
+    lambda {@object.remove(nil, nil, nil, nil, {})}.should raise_error(NotImplementedError)
   end
   
 end
