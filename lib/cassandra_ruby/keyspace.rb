@@ -21,9 +21,18 @@
 #
 
 module CassandraRuby
+  
+  # Main class to communicate with CassandraDB.
   class Keyspace
-    attr_reader :client, :name
+    
+    # returns instance of Cassandra 
+    attr_reader :client
+    
+    # returns name of the Keyspace
+    attr_reader :name
 
+    # * <tt>client</tt> - instance of Cassandra
+    # * <tt>name</tt> - name of the keyspace described in <tt>storage-conf.xml</tt>
     def initialize(client, name)
       @client, @name = client, name.to_s
     end

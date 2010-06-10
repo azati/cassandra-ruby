@@ -38,6 +38,18 @@ describe CassandraRuby::BatchRecord do
     @object.insert('Standard1', nil, ['Column1', 'Column2'], Time.now)
     @object.mutation_map['Standard1'].should_not == nil
     @object.mutation_map['Standard1'].size.should == 2
+    
+    @object.insert('Super1', 'Super', ['Column1', 'Column2'], Time.now)
+    @object.mutation_map['Super1'].should_not == nil
+    @object.mutation_map['Super1'].each do |m|
+      m.class.should == CassandraRuby::Thrift::Mutation
+      m.column_or_supercolumn.class.should == CassandraRuby::Thrift::ColumnOrSuperColumn
+      m.column_or_supercolumn.super_column.columns.each do |c|
+        c.class.should == CassandraRuby::Thrift::Column
+      end
+    end
+     
+    @object.mutation_map['Super1'].size.should == 1
   end
   
   it "#{described_class} should implement 'remove'" do

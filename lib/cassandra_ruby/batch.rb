@@ -24,8 +24,10 @@ module CassandraRuby
   class Batch
     include ThriftHelper
 
+    # Returns keyspace object it was instantiated for
     attr_reader :keyspace
 
+    # <tt>keyspace</tt> - instance of Keyspace
     def initialize(keyspace)
       @keyspace = keyspace
       @records = {}
