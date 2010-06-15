@@ -50,7 +50,7 @@ module CassandraRuby
         client.insert(keyspace.name, key, cast_column_path(column_family, super_column, columns.keys.first), columns.values.first, cast_timestamp(time), cast_consistancy(options))
       else
         keyspace.batch(options) do |batch|
-          batch[key].insert(column_family, super_column, columns, time, options)
+          batch[key].insert(column_family, super_column, columns, time)
         end
       end
     end

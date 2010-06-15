@@ -37,6 +37,20 @@ module CassandraRuby
       @client, @name = client, name.to_s
     end
 
+    # Accessor to the Record functionality.
+    # * <tt>key</tt> - name of the only key in the db
+    # * <tt>keys</tt> - to define set of keys
+    # Set of params defines the implementation of Record
+    # (SingleRecord, MultiRecord, RangeRecord) returned.
+    #
+    #   Keyspace['key1'] => # SingleRecord.new
+    #   Keyspace[['key1', 'key2']] => # MultiRecord.new
+    #   Keyspace['key1'..'key3'] => # RangeRecord.new
+    #
+    # Examples
+    #   keyspace['a_key'].insert(:Standard1, nil, {'column_1' => 'value 1', 'column_2' => 'value 2'}, Time.now)
+    #   keyspace['a_key'].remove(:Standard1, nil, ['column_1', 'column_2'], Time.now)
+    #  
     def [](key, *keys)
       keys = keys.empty? ? key : [key] + keys
 

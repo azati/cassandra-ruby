@@ -24,7 +24,7 @@ module CassandraRuby
   class Batch
     include ThriftHelper
 
-    # Returns keyspace object it was instantiated for
+    # Returns Keyspace object it was instantiated for
     attr_reader :keyspace
 
     # <tt>keyspace</tt> - instance of Keyspace
@@ -33,14 +33,18 @@ module CassandraRuby
       @records = {}
     end
 
+    # Accessor to the set of BatchRecord defined by the key param   
     def [](key)
       @records[key] ||= BatchRecord.new(keyspace)
     end
 
+    # Makes mutations with the set of BatchRecord.
+    # See BatchRecord.insert and BatchRecord.remove to define the kind of mutation to perform. 
     def mutate(options = {})
       keyspace.client.batch_mutate(keyspace.name, mutation_map, cast_consistancy(options))
     end
 
+    # Constructs mutation map from the set of BatchRecord.
     def mutation_map
       @records.inject({}) do |memo, (key, record)|
         memo[key] = record.mutation_map

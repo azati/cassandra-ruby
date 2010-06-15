@@ -47,7 +47,7 @@ module CassandraRuby
     def insert(column_family, super_column, columns, time, options = {})
       keyspace.batch(options) do |batch|
         keys.each do |k|
-          batch[k].insert(column_family, super_column, columns, time, options)
+          batch[k].insert(column_family, super_column, columns, time)
         end
       end
     end
